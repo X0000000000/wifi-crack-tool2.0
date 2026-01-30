@@ -23,22 +23,20 @@ from pathlib import Path
 class WiFiCracker:
     """WiFi密码破解工具主类 / Main WiFi Cracker Class"""
     
-    def __init__(self, ssid, handshake_file=None):
+    def __init__(self, ssid):
         """
         初始化WiFi破解工具
         
         Args:
             ssid: WiFi网络名称 (SSID)
-            handshake_file: 握手包文件路径 (可选)
         """
         self.ssid = ssid
-        self.handshake_file = handshake_file
         self.attempts = 0
         self.start_time = None
         
-    def _hash_password(self, password):
+    def hash_password(self, password):
         """
-        模拟WPA/WPA2密码哈希
+        使用PBKDF2算法哈希密码（类似WPA/WPA2）
         
         Args:
             password: 待测试的密码
@@ -46,10 +44,15 @@ class WiFiCracker:
         Returns:
             密码的哈希值
         """
-        # 实际的WPA/WPA2使用PBKDF2算法
-        # 这里使用简化的哈希用于演示
-        combined = f"{self.ssid}:{password}".encode('utf-8')
-        return hashlib.sha256(combined).hexdigest()
+        # 使用PBKDF2算法，类似实际WPA/WPA2
+        # 迭代次数4096是WPA2标准
+        return hashlib.pbkdf2_hmac(
+            'sha1',
+            password.encode('utf-8'),
+            self.ssid.encode('utf-8'),
+            4096,
+            32
+        ).hex()
     
     def _verify_password(self, password, target_hash=None):
         """
@@ -66,7 +69,7 @@ class WiFiCracker:
         
         # 如果提供了目标哈希，验证它
         if target_hash:
-            return self._hash_password(password) == target_hash
+            return self.hash_password(password) == target_hash
         
         # 实际应用中，这里应该验证握手包
         # 这里返回False表示需要继续尝试
@@ -89,13 +92,13 @@ class WiFiCracker:
         
         dict_path = Path(dictionary_file)
         if not dict_path.exists():
-            print(f"[!] 错误：字典文件不存在 / Error: Dictionary file not found")
+            print(f"[!] 错误：字典文件不存在 / Error: Dictionary file not found: {dictionary_file}")
             return None
         
         self.start_time = time.time()
         
         try:
-            with open(dictionary_file, 'r', encoding='utf-8', errors='ignore') as f:
+            with open(dictionary_file, 'r', encoding='utf-8', errors='replace') as f:
                 for line in f:
                     password = line.strip()
                     if not password:
@@ -134,6 +137,15 @@ class WiFiCracker:
         Returns:
             找到的密码，或 None
         """
+        # 验证长度参数
+        if min_length < 1 or max_length < 1:
+            print(f"[!] 错误：密码长度必须为正数 / Error: Password length must be positive")
+            return None
+        
+        if min_length > max_length:
+            print(f"[!] 错误：最小长度不能大于最大长度 / Error: min_length cannot be greater than max_length")
+            return None
+        
         print(f"\n[*] 开始暴力破解 / Starting brute force attack")
         print(f"[*] SSID: {self.ssid}")
         print(f"[*] 密码长度范围 / Length range: {min_length}-{max_length}")
@@ -272,7 +284,7 @@ Unauthorized access to networks is illegal!
     # 如果提供了测试密码，计算其哈希
     target_hash = None
     if args.test_password:
-        target_hash = cracker._hash_password(args.test_password)
+        target_hash = cracker.hash_password(args.test_password)
         print(f"\n[*] 测试模式 / Test mode: 目标密码 / Target password: {args.test_password}")
     
     # 执行相应的攻击模式

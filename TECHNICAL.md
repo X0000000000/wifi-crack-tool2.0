@@ -24,24 +24,30 @@ wifi_crack.py
 
 ### 1. 密码哈希算法 / Password Hashing
 
-本工具使用简化的哈希方案用于演示：
+本工具使用PBKDF2算法，与实际WPA/WPA2相同：
 
-This tool uses a simplified hashing scheme for demonstration:
+This tool uses PBKDF2 algorithm, same as real WPA/WPA2:
 
 ```python
-def _hash_password(self, password):
-    combined = f"{self.ssid}:{password}".encode('utf-8')
-    return hashlib.sha256(combined).hexdigest()
+def hash_password(self, password):
+    """使用PBKDF2算法哈希密码（类似WPA/WPA2）"""
+    return hashlib.pbkdf2_hmac(
+        'sha1',
+        password.encode('utf-8'),
+        self.ssid.encode('utf-8'),
+        4096,
+        32
+    ).hex()
 ```
 
-**实际 WPA/WPA2 协议 / Real WPA/WPA2 Protocol:**
+**WPA/WPA2 协议细节 / WPA/WPA2 Protocol Details:**
 
 真实的 WPA/WPA2 使用 PBKDF2 (Password-Based Key Derivation Function 2):
 
 Real WPA/WPA2 uses PBKDF2:
 
 ```python
-# 实际实现示例（需要 hashlib）
+# 实际实现（本工具已使用）
 import hashlib
 
 def generate_pmk(ssid, password):

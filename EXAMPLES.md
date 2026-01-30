@@ -252,19 +252,28 @@ Press `Ctrl+C` to safely interrupt the program.
 
 ## 性能参考 / Performance Reference
 
+**注意：使用PBKDF2后，速度明显降低，这更接近真实的WPA/WPA2破解速度。**
+
+**Note: With PBKDF2, speeds are significantly slower, which is more realistic for actual WPA/WPA2 cracking.**
+
 | 字符集 / Charset | 长度 / Length | 组合数 / Combinations | 预估时间 / Est. Time |
 |-----------------|--------------|---------------------|-------------------|
-| digits          | 4            | 10,000              | < 1 秒 / second    |
-| digits          | 6            | 1,000,000           | ~1-2 秒 / seconds  |
-| digits          | 8            | 100,000,000         | ~2-3 分钟 / minutes |
-| lower           | 3            | 17,576              | < 1 秒 / second    |
-| lower           | 4            | 456,976             | ~1-2 秒 / seconds  |
-| lower           | 5            | 11,881,376          | ~20-30 秒 / seconds |
-| alphanum        | 3            | 238,328             | ~1 秒 / second     |
-| alphanum        | 4            | 14,776,336          | ~30-60 秒 / seconds |
+| digits          | 4            | 10,000              | ~10-30 秒 / seconds |
+| digits          | 6            | 1,000,000           | ~15-30 分钟 / minutes |
+| digits          | 8            | 100,000,000         | ~数天 / days |
+| lower           | 3            | 17,576              | ~20-60 秒 / seconds |
+| lower           | 4            | 456,976             | ~10-20 分钟 / minutes |
+| lower           | 5            | 11,881,376          | ~数小时 / hours |
+| alphanum        | 3            | 238,328             | ~5-10 分钟 / minutes |
+| alphanum        | 4            | 14,776,336          | ~数小时 / hours |
 
-**注意 / Note:** 实际性能取决于系统配置。
-Actual performance depends on system configuration.
+**性能说明 / Performance Notes:**
+- PBKDF2 的 4096 次迭代使每次哈希计算需要更多时间
+- 4096 iterations of PBKDF2 make each hash calculation much slower
+- 这是WPA/WPA2安全性的重要组成部分
+- This is a critical part of WPA/WPA2 security
+- 实际速度取决于CPU性能
+- Actual speed depends on system configuration
 
 ## 最佳实践 / Best Practices
 
