@@ -1,0 +1,15 @@
+# WiFi密码破解工具 2.0 依赖项
+# WiFi Password Cracking Tool 2.0 Dependencies
+
+# 核心依赖（标准库，无需额外安装）
+# Core dependencies (standard library, no installation needed)
+# - argparse
+# - hashlib  
+# - itertools
+# - string
+# - sys
+# - time
+# - pathlib
+
+# 本工具仅使用 Python 标准库，无需安装额外依赖
+# This tool only uses Python standard library, no additional dependencies required
